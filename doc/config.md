@@ -242,6 +242,18 @@ This option is only valid when INBUCKET_SMTP_TLSENABLED is enabled.
 
 ## POP3
 
+### Connecting
+
+To connect to POP3, the username must match the mailbox ID;
+
+i.e. for:
+
+* `local` mailbox types, the authentication username must be local-part of the email (e.g. `james` for `james@example.com`)
+* `full` mailbox types, the authentication username  must be the full email address (e.g. `james@example.com`)
+* `domain` mailbox types, the authentication username must be the domain (e.g. `example.com` for emails to `*@example.com`)
+
+Any value can be used for the password during authentication to POP3.
+
 ### Address and Port
 
 `INBUCKET_POP3_ADDR`
