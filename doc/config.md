@@ -27,6 +27,7 @@ variables it supports:
     INBUCKET_POP3_ADDR                  0.0.0.0:1100        POP3 server IP4 host:port
     INBUCKET_POP3_DOMAIN                inbucket            HELLO domain
     INBUCKET_POP3_TIMEOUT               600s                Idle network timeout
+    INBUCKET_POP3_PASSWORD                                  Set a required password for POP3 access
     INBUCKET_WEB_ADDR                   0.0.0.0:9000        Web server IP4 host:port
     INBUCKET_WEB_UIDIR                  ui/dist             User interface dir
     INBUCKET_WEB_GREETINGFILE           ui/greeting.html    Home page greeting HTML
@@ -252,8 +253,6 @@ i.e. for:
 * `full` mailbox types, the authentication username  must be the full email address (e.g. `james@example.com`)
 * `domain` mailbox types, the authentication username must be the domain (e.g. `example.com` for emails to `*@example.com`)
 
-Any value can be used for the password during authentication to POP3.
-
 ### Address and Port
 
 `INBUCKET_POP3_ADDR`
@@ -288,6 +287,14 @@ to the public internet.
 - Default: `600s`
 - Values: Duration ending in `s` for seconds, `m` for minutes
 
+### Authentication Password
+
+`INBUCKET_POP3_PASSWORD`
+
+Specify a password that is required during POP3 authentication.  If left empty,
+any password may be provided for POP3 authentication.
+
+- Default: ``
 
 ## Web
 
