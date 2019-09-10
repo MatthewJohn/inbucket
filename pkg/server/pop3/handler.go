@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"crypto/sha512"
 
 	"github.com/inbucket/inbucket/pkg/storage"
 	"github.com/rs/zerolog"
@@ -25,6 +26,8 @@ const (
 	TRANSACTION
 	// QUIT state: client requests us to end session
 	QUIT
+	// Password hashing iterations
+	HASHING_ITERATIONS = 1
 )
 
 func (s State) String() string {
@@ -201,11 +204,16 @@ func (s *Session) authorizationHandler(cmd string, args []string) {
 			s.send("-ERR Missing username argument")
 		}
 	case "PASS":
-		var password string = args[1]
+		if len(args) == 0 {
+			s.send("-ERR Missing password argument")
+			return
+		}
+
+		var password string = args[0]
 
 		if s.user == "" {
 			s.ooSeq(cmd)
-		} else if (s.config.Password == "" || password == s.config.Password) {
+		} else if (s.checkPassword(password)) {
 			s.loadMailbox()
 			s.send(fmt.Sprintf("+OK Found %v messages for %v", s.msgCount, s.user))
 			s.enterState(TRANSACTION)
@@ -225,6 +233,46 @@ func (s *Session) authorizationHandler(cmd string, args []string) {
 	default:
 		s.ooSeq(cmd)
 	}
+}
+
+// checkPassword Test password against stored valid password.
+func (s *Session) checkPassword(password_t string) bool {
+	// Obtain the (real) password and salt from config.
+	var salt_hash_config string = s.config.Password
+
+	// Test if real password is not set and return valid, accepting
+	// any password.
+	if (salt_hash_config == "") {
+		return true
+	}
+
+	// Ensure that the stored hash is at least the size
+	// of a SHA-512 hash.
+	if (len(salt_hash_config) < 128) {
+		s.logger.Error().Msgf("POP3 password does not appear to be a valid SHA-512.")
+		return false
+	}
+
+	// Split config value as salt and hashed value.
+	var config_l int = len(salt_hash_config)
+	var hash_config string = salt_hash_config[config_l-128:]
+	var salt_config string = salt_hash_config[:config_l-128]
+
+	// Create byte-array for holding hashed test password.
+	var hashed_password_t = []byte(password_t + salt_config)
+
+	// Perform hashing iterations, passing result
+	// from previous hash into value for next hash.
+	for i := 1; i <= HASHING_ITERATIONS; i++ {
+		hasher := sha512.New()
+		hasher.Write(hashed_password_t)
+		//hashed_password_t = base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+		hashed_password_t = hasher.Sum(nil)
+		s.logger.Warn().Msgf("Hashing iter: %v", hashed_password_t)
+	}
+
+	// Check that generated hash matched the stored expected hash
+	return (string(hashed_password_t) == hash_config)
 }
 
 // TRANSACTION state
