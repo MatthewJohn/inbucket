@@ -87,10 +87,11 @@ type SMTP struct {
 
 // POP3 contains the POP3 server configuration.
 type POP3 struct {
-	Addr    string        `required:"true" default:"0.0.0.0:1100" desc:"POP3 server IP4 host:port"`
-	Domain  string        `required:"true" default:"inbucket" desc:"HELLO domain"`
-	Timeout time.Duration `required:"true" default:"600s" desc:"Idle network timeout"`
-	Debug   bool          `ignored:"true"`
+	Addr     string        `required:"true" default:"0.0.0.0:1100" desc:"POP3 server IP4 host:port"`
+	Domain   string        `required:"true" default:"inbucket" desc:"HELLO domain"`
+	Timeout  time.Duration `required:"true" default:"600s" desc:"Idle network timeout"`
+	Password string        `required:"false" desc:"Set required password for POP3 authentication"`
+	Debug    bool          `ignored:"true"`
 }
 
 // Web contains the HTTP server configuration.

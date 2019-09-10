@@ -201,12 +201,16 @@ func (s *Session) authorizationHandler(cmd string, args []string) {
 			s.send("-ERR Missing username argument")
 		}
 	case "PASS":
+		var password string = args[1]
+
 		if s.user == "" {
 			s.ooSeq(cmd)
-		} else {
+		} else if (s.config.Password == "" || password == s.config.Password) {
 			s.loadMailbox()
 			s.send(fmt.Sprintf("+OK Found %v messages for %v", s.msgCount, s.user))
 			s.enterState(TRANSACTION)
+		} else {
+			s.send("-ERR Incorrect password")
 		}
 	case "APOP":
 		if len(args) != 2 {
