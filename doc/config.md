@@ -294,7 +294,7 @@ to the public internet.
 Specify a password that is required during POP3 authentication.  If left empty,
 any password may be provided for POP3 authentication.
 
-- Default: ``
+- Default: (empty - any password accepted)
 
 ## Web
 

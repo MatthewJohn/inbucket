@@ -267,7 +267,7 @@ func (s *Session) checkPassword(password_t string) bool {
 		hasher := sha512.New()
 		hasher.Write(hashed_password_t)
 		//hashed_password_t = base64.URLEncoding.EncodeToString(hasher.Sum(nil))
-		hashed_password_t = hasher.Sum(nil)
+		hashed_password_t = base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 		s.logger.Warn().Msgf("Hashing iter: %v", hashed_password_t)
 	}
 
